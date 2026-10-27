@@ -33,7 +33,7 @@ export const IMAGE_SLOTS = {
   "about-hero": { where: "หน้าข้อมูลเพิ่มเติม ด้านบน", size: "640 × 340" },
   "desk-left": { where: "ตกแต่งซ้ายของกรอบมือถือ (เฉพาะจอคอม)", size: "440 × 600" },
   "desk-right": { where: "ตกแต่งขวาของกรอบมือถือ (เฉพาะจอคอม)", size: "440 × 600" },
-  "logo": { where: "โลโก้มุมซ้ายบน แทนตัวอักษร Glossary.", size: "สูง 56 px (กว้างตามสัดส่วน)" },
+  "logo": { where: "โลโก้มุมซ้ายบน แทนตัวอักษร KUM-TEM.", size: "สูง 56 px (กว้างตามสัดส่วน)" },
 } as const;
 
 export type ImageSlot = keyof typeof IMAGE_SLOTS;

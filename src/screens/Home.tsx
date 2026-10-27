@@ -20,7 +20,7 @@ export function HomeHeader() {
   return (
     <header className="home-header">
       <button className="logo-btn" onClick={() => go({ name: "home" })} aria-label="หน้าแรก">
-        <Art slot="logo" className="logo-art" fallback={<Wordmark />} alt="Glossary" />
+        <Art slot="logo" className="logo-art" fallback={<Wordmark thai />} alt="KUM-TEM คำเต็ม" />
       </button>
       <div className="home-header-actions">
         <button className="icon-btn icon-btn--count" onClick={() => go({ name: "saved" })} aria-label={`สมุดคำ ${savedIds.length} คำ`}>
@@ -48,13 +48,14 @@ export function Home({ query }: { query: string }) {
       <HomeHeader />
       {!searching ? (
         <section className="hero">
-          <p className="eyebrow">Creatr365 · Live Commerce</p>
-          <h1>
-            ค้นคำย่อ
-            <br />
-            วงการไลฟ์<span className="hero-dot" aria-hidden />
+          <p className="hero-note" lang="en">Alphabet soup? Chill out... I’ll spell 'em out.</p>
+          <h1 className="hero-title" lang="en">
+            UN-SHORT<span className="hero-dot" aria-hidden />
           </h1>
-          <p className="hero-lead">พิมพ์ตัวย่อ คำอ่าน หรือความหมาย — พิมพ์ผิดนิด ลืมสลับภาษา ก็ยังหาเจอ</p>
+          <p className="hero-sub">
+            จากตัวย่อ ให้เป็น <mark>คำ เต็ม เต็ม</mark>
+          </p>
+          <p className="hero-lead">รวมคำเต็มๆ ของหลากหลายกลุ่มที่ใช้กัน เพื่อให้ชาว Creatr365 สบายยยย สบายยย</p>
           <Art slot="home-hero" className="hero-art" fallback={<SceneDesk />} />
         </section>
       ) : null}
@@ -76,7 +77,7 @@ export function Home({ query }: { query: string }) {
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             onBlur={() => remember(query)}
-            placeholder="เช่น GMV, ซีวีอาร์, ยอดขาย"
+            placeholder="พิมพ์ตัวย่อที่อยากยืดดดด ได้เลยย"
             autoComplete="off"
             autoCorrect="off"
             autoCapitalize="off"

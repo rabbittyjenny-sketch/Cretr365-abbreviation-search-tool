@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { Art } from "../components/Art";
 import { IconBook, IconClose, IconGrid, IconInfo, IconSparkle, IconStar, SceneListen, SceneSave, SceneSearch } from "../components/doodles";
 import { Wordmark } from "../components/ui";
@@ -6,8 +6,20 @@ import type { ImageSlot } from "../config/images";
 import { useApp } from "../context";
 import type { VoiceMode } from "../lib/speech";
 
-const SLIDES: { word: string; slot: ImageSlot; body: string; Fallback: typeof SceneSearch }[] = [
-  { word: "Search", slot: "onboarding-1", body: "พิมพ์ตัวย่อหรือคำที่ได้ยินในไลฟ์ พิมพ์ผิดนิด หรือลืมสลับภาษา ก็ยังหาคำที่ใกล้ที่สุดให้", Fallback: SceneSearch },
+const SLIDES: { word: string; kicker?: string; slot: ImageSlot; body: ReactNode; Fallback: typeof SceneSearch }[] = [
+  {
+    word: "KUM-TEM",
+    kicker: "คำเต็ม",
+    slot: "onboarding-1",
+    body: (
+      <>
+        ตัวย่อที่ยุ่งยาก? ไม่อยากยืนงง
+        <br />
+        ก็ส่งมาให้<span className="stretch">ยืดดดดดด</span>
+      </>
+    ),
+    Fallback: SceneSearch,
+  },
   { word: "Listen", slot: "onboarding-2", body: "กดลำโพงเพื่อฟังวิธีอ่านเฉพาะคำนั้น ไม่อ่านยาวทั้งย่อหน้า พูดตามได้ทันที", Fallback: SceneListen },
   { word: "Save", slot: "onboarding-3", body: "เก็บคำที่ใช้บ่อยไว้ในสมุดคำ แล้วไล่ดูคำในหมวดเดียวกันต่อได้เลย", Fallback: SceneSave },
 ];
@@ -44,7 +56,8 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
         </div>
       </div>
       <div className="onboarding-body" key={slide.word}>
-        <h1 className="onboarding-word">
+        {slide.kicker ? <p className="onboarding-kicker">{slide.kicker}</p> : null}
+        <h1 className={`onboarding-word ${slide.kicker ? "onboarding-word--brand" : ""}`} lang="en">
           {slide.word}
           <span className="wordmark-dot" aria-hidden />
         </h1>

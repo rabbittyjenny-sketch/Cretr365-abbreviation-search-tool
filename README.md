@@ -1,7 +1,11 @@
-# Glossary. — คลังคำย่อ Live Commerce (Creatr365)
+# KUM-TEM. (คำเต็ม) — UN-SHORT ตัวย่อให้เป็นคำเต็ม
 
-เว็บแอปค้นคำย่อ/ศัพท์วงการไลฟ์คอมเมิร์ซ สไตล์ doodle บนกระดาษ แสดงผลเป็นหน้าจอมือถือ
-เปิดได้ทุกอุปกรณ์ และฝังในเว็บอื่นด้วย `<iframe>` ได้
+> *Alphabet soup? Chill out... I’ll spell 'em out.*
+
+ตัวย่อที่ยุ่งยาก? ไม่อยากยืนงง ก็ส่งมาให้ยืด — รวมคำเต็มๆ ของหลากหลายกลุ่มที่ใช้กัน
+เพื่อให้ชาว Creatr365 สบายยยย สบายยย
+
+เว็บแอปสไตล์ doodle บนกระดาษ แสดงผลเป็นหน้าจอมือถือ เปิดได้ทุกอุปกรณ์ และฝังในเว็บอื่นด้วย `<iframe>` ได้
 
 - **ค้นหาแบบให้คะแนน** — ตรงทั้งคำ > ขึ้นต้นเหมือนกัน > มีคำนั้นอยู่ > คำอ่านไทย > สะกดใกล้เคียง
 - **พิมพ์ผิดก็เจอ** — `gvm` → GMV, `raos` → ROAS, `เด็ดแอร์` → Dead Air
@@ -79,7 +83,7 @@ npm run build    # build ไปที่ dist/
 ```html
 <iframe
   src="https://YOUR-APP.vercel.app/?embed=1"
-  title="Creatr365 Glossary"
+  title="KUM-TEM คำเต็ม"
   style="width:100%;max-width:420px;height:760px;border:0;display:block;margin:0 auto"
   loading="lazy"></iframe>
 ```
