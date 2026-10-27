@@ -95,7 +95,7 @@ export function AboutScreen() {
       <section className="about-hero">
         <Art slot="about-hero" className="about-art" fallback={<SceneAbout />} />
         <h1>
-          เกี่ยวกับคลังคำ<span className="hero-dot" aria-hidden />
+          เกี่ยวกับ KUM-TEM<span className="hero-dot" aria-hidden />
         </h1>
         <p>{stripMd(glossary.docTitle)}</p>
         <p className="muted">

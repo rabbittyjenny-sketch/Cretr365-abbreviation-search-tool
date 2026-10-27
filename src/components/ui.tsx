@@ -4,10 +4,11 @@ import type { Entry } from "../data/types";
 import type { Speech } from "../lib/speech";
 import { IconArrow, IconBack, IconSpeaker, IconStar } from "./doodles";
 
-export function Wordmark({ small = false }: { small?: boolean }) {
+export function Wordmark({ small = false, thai = false }: { small?: boolean; thai?: boolean }) {
   return (
     <span className={`wordmark ${small ? "wordmark--small" : ""}`}>
-      Glossary<span className="wordmark-dot" aria-hidden />
+      KUM-TEM<span className="wordmark-dot" aria-hidden />
+      {thai ? <span className="wordmark-th">คำเต็ม</span> : null}
     </span>
   );
 }
