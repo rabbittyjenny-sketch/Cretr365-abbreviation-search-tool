@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import { LABEL_INFO, tokenizeInline } from "../lib/markdown";
+import { LABEL_INFO, splitTopLevel, tokenizeInline } from "../lib/markdown";
 
 /** Renders one source cell: bold, links (open in a new tab) and status labels. */
 export function Rich({ value }: { value: string }) {
@@ -55,28 +55,4 @@ export function RichField({ value, label }: { value: string; label: string }) {
       ))}
     </ul>
   );
-}
-
-/** Splits on `separator` only outside brackets/parentheses, so labels and links stay whole. */
-function splitTopLevel(value: string, separator: string) {
-  const parts: string[] = [];
-  let depth = 0;
-  let start = 0;
-  for (let i = 0; i < value.length; i += 1) {
-    const char = value[i];
-    if (char === "\\" && (value[i + 1] === "[" || value[i + 1] === "]")) {
-      depth += value[i + 1] === "[" ? 1 : -1;
-      i += 1;
-      continue;
-    }
-    if (char === "[" || char === "(") depth += 1;
-    else if (char === "]" || char === ")") depth = Math.max(0, depth - 1);
-    else if (depth === 0 && value.startsWith(separator, i)) {
-      parts.push(value.slice(start, i));
-      start = i + separator.length;
-      i += separator.length - 1;
-    }
-  }
-  parts.push(value.slice(start));
-  return parts;
 }

@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { IconBack, IconCopy } from "../components/doodles";
+import { useMemo } from "react";
+import { IconBack } from "../components/doodles";
 import { Rich, RichField } from "../components/Rich";
 import { SaveButton, SectionTitle, SpeakButton, TermRow, termSize, TopBar } from "../components/ui";
 import { entries, entriesInCategory, getCategory, getEntry } from "../data/glossary";
@@ -30,7 +30,6 @@ function mentionedTerms(entry: Entry) {
 export function Detail({ id, variantIndex = 0 }: { id: string; variantIndex?: number }) {
   const { back, go, speech, isSaved, toggleSaved } = useApp();
   const entry = getEntry(id);
-  const [copied, setCopied] = useState(false);
   const mentions = useMemo(() => (entry ? mentionedTerms(entry) : []), [entry]);
 
   if (!entry) {
@@ -51,18 +50,6 @@ export function Detail({ id, variantIndex = 0 }: { id: string; variantIndex?: nu
   const tones = entry.labels.map((label) => toneFor(label)).filter(Boolean) as (keyof typeof LABEL_INFO)[];
   const hasPairs = entry.variants.filter((variant) => variant.pron).length > 1;
 
-  const copyLink = async () => {
-    try {
-      const url = new URL(window.location.href);
-      url.searchParams.delete("embed");
-      await navigator.clipboard.writeText(url.toString());
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1800);
-    } catch {
-      // clipboard blocked (e.g. inside some iframes) — nothing else to do
-    }
-  };
-
   return (
     <div className="screen-with-bar">
       <div className="screen-scroll" data-screen="term">
@@ -73,12 +60,9 @@ export function Detail({ id, variantIndex = 0 }: { id: string; variantIndex?: nu
         />
 
         <article className="term">
-          <div className="term-head">
-            <h1 className="term-title" data-size={termSize(entry.term)}>
-              {entry.term}
-            </h1>
-            <SpeakButton entry={entry} variantIndex={variantIndex} speech={speech} />
-          </div>
+          <h1 className="term-title" data-size={termSize(entry.term)}>
+            {entry.term}
+          </h1>
 
           {hasPairs ? (
             <ul className="readings">
@@ -86,19 +70,19 @@ export function Detail({ id, variantIndex = 0 }: { id: string; variantIndex?: nu
                 variant.pron ? (
                   <li key={variant.text} className={index === variantIndex ? "is-current" : undefined}>
                     <span className="readings-term">{variant.text}</span>
-                    <span className="readings-pron">อ่านว่า {variant.pron}</span>
-                    <SpeakButton entry={entry} variantIndex={index} speech={speech} />
+                    <span className="readings-pron">({variant.pron})</span>
                   </li>
                 ) : null,
               )}
             </ul>
           ) : entry.pronunciation ? (
-            <p className="term-pron">
-              อ่านว่า <strong>{entry.pronunciation}</strong>
-            </p>
+            <p className="term-pron">({entry.pronunciation})</p>
           ) : null}
 
-          {entry.fullName ? <p className="term-full">{entry.fullName}</p> : null}
+          <div className="term-full">
+            <p>{entry.fullName || entry.term}</p>
+            <SpeakButton entry={entry} speech={speech} />
+          </div>
 
           {tones.length || entry.mustKnow ? (
             <div className="term-tags">
@@ -124,25 +108,14 @@ export function Detail({ id, variantIndex = 0 }: { id: string; variantIndex?: nu
             </section>
           ))}
 
-          {entry.extraBlocks.map((block, blockIndex) => (
-            <section key={blockIndex} className="extra">
-              <p className="extra-source">อ้างถึงอีกครั้งใน {block.source}</p>
-              {block.fields.map((field, index) => (
-                <div key={index} className="field field--small">
-                  <h3 className="field-label">{field.label}</h3>
-                  <RichField value={field.value} label={field.label} />
-                </div>
-              ))}
-            </section>
-          ))}
-
-          <p className="term-section">
-            ที่มาในคลังคำ: <Rich value={entry.section} />
-          </p>
-
-          <button className="text-btn copy-btn" onClick={copyLink}>
-            <IconCopy size={18} /> {copied ? "คัดลอกลิงก์แล้ว" : "คัดลอกลิงก์คำนี้"}
-          </button>
+          {entry.extraBlocks.map((block, blockIndex) =>
+            block.fields.map((field, index) => (
+              <section key={`${blockIndex}-${index}`} className="field">
+                <h2 className="field-label">{block.source}</h2>
+                <RichField value={field.value} label={field.label} />
+              </section>
+            )),
+          )}
         </article>
 
         {mentions.length ? (

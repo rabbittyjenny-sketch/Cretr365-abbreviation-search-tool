@@ -457,3 +457,8 @@ export const IconGrid = (p: { size?: number }) => (
     <path d="M4.4 4.6 L 10.6 4.4 L 10.4 10.6 L 4.6 10.4 Z M13.4 4.4 L 19.6 4.6 L 19.4 10.4 L 13.6 10.6 Z M4.6 13.4 L 10.4 13.6 L 10.6 19.6 L 4.4 19.4 Z M13.6 13.6 L 19.4 13.4 L 19.6 19.4 L 13.4 19.6 Z" />
   </Icon>
 );
+export const IconHome = (p: { size?: number }) => (
+  <Icon {...p}>
+    <path d="M3.6 11.4 L 12 4.2 L 20.4 11.2 M6 9.6 L 6.2 19.6 L 17.8 19.4 L 18 9.6 M10 19.4 L 10.1 14.2 L 13.9 14.1 L 14 19.4" />
+  </Icon>
+);

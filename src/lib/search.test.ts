@@ -91,16 +91,26 @@ describe("search ranking", () => {
 });
 
 describe("speech text", () => {
-  it("reads only the searched variant, never the explanation", async () => {
+  it("reads the full name (คำเต็ม), never the abbreviation or the explanation", async () => {
     const { utteranceFor } = await import("./speech");
-    const cr = entries.find((entry) => entry.id === "cr")!;
-    expect(utteranceFor(cr, 1, true)).toEqual({ text: "ซี วี อาร์", lang: "th" });
-    expect(utteranceFor(cr, 1, false)).toEqual({ text: "CVR", lang: "en" });
-    const gmv = entries.find((entry) => entry.id === "gmv")!;
-    expect(utteranceFor(gmv, 0, true).text).toBe("จี เอ็ม วี");
-    const fomo = entries.find((entry) => entry.id === "fomo")!;
-    expect(utteranceFor(fomo, 0, true).text).toBe("โฟ โม");
-    const pl = entries.find((entry) => entry.id === "p-and-l")!;
-    expect(utteranceFor(pl, 0, false).text).toBe("P and L");
+    const say = (id: string) => utteranceFor(entries.find((entry) => entry.id === id)!);
+    expect(say("cr")).toBe("Conversion Rate");
+    expect(say("gmv")).toBe("Gross Merchandise Value");
+    expect(say("ebitda")).toBe("Earnings Before Interest, Taxes, Depreciation and Amortization");
+    expect(say("sow")).toBe("Scope of Work");
+    expect(say("m1-m6")).toBe("Month 1 to Month 6");
+    expect(say("s-o-r")).toBe("Stimulus, Organism, Response");
+    expect(say("live-health-score")).toBe("Live Health Score");
+    // no English full name in the source -> the term itself
+    expect(say("content")).toBe("Content");
+    expect(say("the-spike")).toBe("The Spike");
+  });
+});
+
+describe("cleaned content", () => {
+  it("has no in-document pointers or audit notes", () => {
+    const text = entries.flatMap((entry) => [...entry.fields.map((field) => field.value), ...entry.extraBlocks.flatMap((block) => block.fields.map((field) => field.value))]).join("\n");
+    expect(text).not.toMatch(/ที่มา: (คอร์ส|Module|Appendix|Glossary)/);
+    expect(text).not.toMatch(/ตัวเลขเดิม|ต้นฉบับเดิม|ดูหมวด 12/);
   });
 });

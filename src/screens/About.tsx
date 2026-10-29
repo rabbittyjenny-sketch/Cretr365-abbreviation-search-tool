@@ -1,11 +1,10 @@
 import { Art } from "../components/Art";
 import { SceneAbout } from "../components/doodles";
 import { Rich } from "../components/Rich";
-import { SectionTitle, TopBar } from "../components/ui";
-import { categories, entries, glossary } from "../data/glossary";
+import { Credit, SectionTitle, TopBar } from "../components/ui";
+import { glossary } from "../data/glossary";
 import { useApp } from "../context";
 import { LABEL_INFO, splitRow, stripMd, type LabelTone } from "../lib/markdown";
-import type { VoiceMode } from "../lib/speech";
 
 /** Minimal block renderer for the appendix: tables, paragraphs, bullets, italics. */
 function Markdown({ source }: { source: string }) {
@@ -78,16 +77,10 @@ function Markdown({ source }: { source: string }) {
 }
 
 const ORDER = ["12.3", "12.1", "12.2", "11.3"];
-const AUDIT = ["12.4", "12.5", "12.6"];
 
 export function AboutScreen() {
-  const { back, speech } = useApp();
+  const { back } = useApp();
   const section = (id: string) => glossary.appendix.find((item) => item.id === id);
-  const voiceOptions: { value: VoiceMode; label: string }[] = [
-    { value: "auto", label: "อัตโนมัติ" },
-    { value: "th", label: "คำอ่านไทย" },
-    { value: "en", label: "English" },
-  ];
 
   return (
     <div className="screen-scroll" data-screen="about">
@@ -97,28 +90,10 @@ export function AboutScreen() {
         <h1>
           เกี่ยวกับ KUM-TEM<span className="hero-dot" aria-hidden />
         </h1>
-        <p>{stripMd(glossary.docTitle)}</p>
-        <p className="muted">
-          {entries.length} คำ · {categories.length} หมวด · ข้อมูลทั้งหมดอ่านจากไฟล์คลังคำฉบับเต็ม
-        </p>
+        <p>รวมคำเต็มๆ ของหลากหลายกลุ่มที่ใช้กัน เพื่อให้ชาว Creatr365 สบายยยย สบายยย — ปุ่มลำโพงอ่านคำเต็มของแต่ละตัวย่อให้ฟัง</p>
       </section>
 
       <div className="pad-x">
-        {speech.supported ? (
-          <section className="setting">
-            <SectionTitle note="ลำโพงจะอ่านเฉพาะคำ ไม่อ่านคำอธิบาย">เสียงอ่าน</SectionTitle>
-            <div className="segmented" role="radiogroup" aria-label="เสียงอ่าน">
-              {voiceOptions.map((option) => (
-                <button key={option.value} role="radio" aria-checked={speech.mode === option.value} className={speech.mode === option.value ? "is-on" : undefined} onClick={() => speech.setMode(option.value)}>
-                  {option.label}
-                </button>
-              ))}
-            </div>
-            <p className="muted small">
-              {speech.hasThaiVoice ? "เครื่องนี้มีเสียงภาษาไทย — อ่านตามคำอ่านในคลังคำ" : "ยังไม่พบเสียงภาษาไทยในเครื่องนี้ — โหมดอัตโนมัติจะอ่านคำภาษาอังกฤษแทน"}
-            </p>
-          </section>
-        ) : null}
 
         <SectionTitle>ป้ายกำกับในคำอธิบาย</SectionTitle>
         <ul className="legend">
@@ -144,27 +119,13 @@ export function AboutScreen() {
           );
         })}
 
-        <SectionTitle note="สำหรับทีมที่ดูแลเนื้อหา">บันทึกการตรวจข้อมูล</SectionTitle>
-        {AUDIT.map((id) => {
-          const item = section(id);
-          if (!item) return null;
-          return (
-            <details key={id} className="appendix">
-              <summary>
-                <span className="appendix-id">{id}</span> {stripMd(item.title)}
-              </summary>
-              <Markdown source={item.markdown} />
-            </details>
-          );
-        })}
-
         {section("sources") ? (
-          <details className="appendix">
-            <summary>แหล่งที่มา</summary>
+          <section className="sources">
+            <SectionTitle>แหล่งที่มา</SectionTitle>
             <Markdown source={section("sources")!.markdown} />
-          </details>
+          </section>
         ) : null}
-        <div className="bar-spacer" />
+        <Credit />
       </div>
     </div>
   );
