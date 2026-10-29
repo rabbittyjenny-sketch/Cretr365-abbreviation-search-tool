@@ -736,7 +736,7 @@ mark {
   line-height: 1.65;
 }
 .hero-art {
-  max-width: 300px;
+  max-width: 340px;
   margin: 2px auto -6px;
 }
 
@@ -1008,6 +1008,11 @@ mark {
 .best-pron strong {
   font-weight: 600;
 }
+.best-reading {
+  margin: -4px 0 10px;
+  font-size: 15px;
+  color: rgba(244, 240, 232, 0.8);
+}
 .best-full {
   margin-top: 12px;
   font-size: 14px;
@@ -1072,6 +1077,11 @@ mark {
 .row-pron {
   font-size: 13px;
   color: var(--ink-2);
+}
+.row-full {
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.45;
 }
 .row-summary {
   display: -webkit-box;
@@ -1233,12 +1243,19 @@ mark {
   height: 34px;
 }
 .term-full {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   margin: 14px 0 0;
-  padding-left: 11px;
+  padding: 10px 10px 10px 12px;
   border-left: 3px solid var(--lime);
-  font-size: 15px;
-  line-height: 1.55;
-  color: var(--ink-2);
+  background: var(--card);
+}
+.term-full p {
+  flex: 1;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
 }
 .term-tags {
   display: flex;
@@ -1799,4 +1816,20 @@ mark {
   .speak-btn {
     transition: none;
   }
+}
+
+/* ---------- credit footer ---------- */
+
+.credit {
+  margin: 30px 0 0;
+  padding-top: 14px;
+  border-top: 1.5px dashed var(--line);
+  font-size: 11.5px;
+  line-height: 1.7;
+  color: var(--muted);
+  text-align: center;
+}
+.credit a {
+  color: inherit;
+  text-underline-offset: 3px;
 }

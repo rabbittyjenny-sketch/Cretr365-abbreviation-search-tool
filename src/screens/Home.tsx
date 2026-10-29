@@ -1,8 +1,8 @@
 import { useMemo, useRef } from "react";
 import { Art } from "../components/Art";
-import { CategoryDoodle, IconClose, IconGrid, IconInfo, IconMenu, IconSearch, IconStar, SceneDesk, SceneMustKnow, SceneSignpost } from "../components/doodles";
-import { Marked, SaveButton, SectionTitle, SpeakButton, TermRow, termSize, Wordmark } from "../components/ui";
-import { categories, entries, entriesInCategory, getCategory, mustKnow } from "../data/glossary";
+import { CategoryDoodle, IconClose, IconGrid, IconInfo, IconMenu, IconSearch, IconStar, SceneDesk, SceneSignpost } from "../components/doodles";
+import { Credit, Marked, SaveButton, SectionTitle, shortFullName, SpeakButton, TermRow, termSize, Wordmark } from "../components/ui";
+import { categories, entries, entriesInCategory, getCategory } from "../data/glossary";
 import type { ImageSlot } from "../config/images";
 import { useApp } from "../context";
 import { createSearch, type Hit, type MatchType } from "../lib/search";
@@ -145,18 +145,12 @@ function Results({ query, result }: { query: string; result: ReturnType<typeof e
             <Marked text={first.entry.term} query={shownQuery} />
           </h2>
           {first.entry.variants[first.variantIndex]?.pron || first.entry.pronunciation ? (
-            <div className="best-pron">
-              <span>
-                อ่านว่า <strong>{first.entry.variants[first.variantIndex]?.pron ?? first.entry.pronunciation}</strong>
-              </span>
-              <SpeakButton entry={first.entry} variantIndex={first.variantIndex} speech={speech} label="ฟัง" inverted />
-            </div>
-          ) : (
-            <div className="best-pron">
-              <SpeakButton entry={first.entry} variantIndex={first.variantIndex} speech={speech} label="ฟัง" inverted />
-            </div>
-          )}
-          {first.entry.fullName ? <p className="best-full">{first.entry.fullName}</p> : null}
+            <p className="best-reading">({first.entry.variants[first.variantIndex]?.pron ?? first.entry.pronunciation})</p>
+          ) : null}
+          <div className="best-pron">
+            <strong>{shortFullName(first.entry.fullName || first.entry.term)}</strong>
+            <SpeakButton entry={first.entry} speech={speech} label="ฟัง" inverted />
+          </div>
           <p className="best-summary">{first.entry.summary}</p>
           <span className="best-more">
             อ่านรายละเอียด <span aria-hidden>↗</span>
@@ -227,28 +221,6 @@ function Browse() {
         </section>
       ) : null}
 
-      <section className="feature" onClick={() => go({ name: "must" })} role="link" tabIndex={0} onKeyDown={(event) => event.key === "Enter" && go({ name: "must" })}>
-        <div className="feature-copy">
-          <p className="feature-kicker">เริ่มตรงนี้</p>
-          <h2>
-            {mustKnow.length} คำ
-            <br />
-            ที่ต้องรู้
-          </h2>
-          <p>คำที่ใช้ทุกไลฟ์ ตั้งแต่ GMV ถึง Dead Air</p>
-          <span className="btn btn--paper">เริ่มเลย</span>
-        </div>
-        <Art slot="must-know" className="feature-art" fallback={<SceneMustKnow />} />
-      </section>
-
-      <div className="chips chips--must">
-        {mustKnow.slice(0, 8).map((entry) => (
-          <button key={entry.id} className="chip chip--term" onClick={() => go({ name: "term", id: entry.id })}>
-            {entry.variants[0]?.text ?? entry.term}
-          </button>
-        ))}
-      </div>
-
       <SectionTitle count={categories.length} note="แตะเพื่อดูคำในหมวด">
         หมวดหมู่
       </SectionTitle>
@@ -258,9 +230,7 @@ function Browse() {
             <Art slot={`category-${category.num}` as ImageSlot} className="tile-art" fallback={<CategoryDoodle id={category.id} />} />
             <span className="tile-num">{String(category.num).padStart(2, "0")}</span>
             <span className="tile-title">{category.title}</span>
-            <span className="tile-meta">
-              {category.en} · {entriesInCategory(category.id).length} คำ
-            </span>
+            <span className="tile-meta">{category.en}</span>
           </button>
         ))}
       </div>
@@ -274,12 +244,7 @@ function Browse() {
         </button>
       </div>
 
-      <footer className="foot">
-        <p>
-          {entries.length} คำ · {categories.length} หมวด
-        </p>
-        <p>ข้อมูลจาก Creatr365 Master Glossary</p>
-      </footer>
+      <Credit />
     </div>
   );
 }

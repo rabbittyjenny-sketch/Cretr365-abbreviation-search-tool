@@ -2,7 +2,8 @@ import type { ReactNode } from "react";
 import { getCategory } from "../data/glossary";
 import type { Entry } from "../data/types";
 import type { Speech } from "../lib/speech";
-import { IconArrow, IconBack, IconSpeaker, IconStar } from "./doodles";
+import { useApp } from "../context";
+import { IconArrow, IconBack, IconHome, IconSpeaker, IconStar } from "./doodles";
 
 export function Wordmark({ small = false, thai = false }: { small?: boolean; thai?: boolean }) {
   return (
@@ -42,24 +43,35 @@ export function TopBar({ title, onBack, right }: { title?: ReactNode; onBack?: (
           <IconBack />
         </button>
       ) : null}
+      <HomeButton />
       <div className="topbar-title">{title}</div>
       <div className="topbar-right">{right}</div>
     </header>
   );
 }
 
-export function SpeakButton({ entry, variantIndex = 0, speech, label, inverted = false }: { entry: Entry; variantIndex?: number; speech: Speech; label?: string; inverted?: boolean }) {
+/** Jumps straight back to the first page, however deep the user has gone. */
+function HomeButton() {
+  const { go } = useApp();
+  return (
+    <button className="icon-btn" onClick={() => go({ name: "home" })} aria-label="กลับหน้าแรก" title="หน้าแรก">
+      <IconHome />
+    </button>
+  );
+}
+
+/** Reads the term's full name aloud (คำเต็ม), not the abbreviation. */
+export function SpeakButton({ entry, speech, label, inverted = false }: { entry: Entry; speech: Speech; label?: string; inverted?: boolean }) {
   if (!speech.supported) return null;
-  const variant = entry.variants[variantIndex] ?? entry.variants[0];
-  const active = speech.speakingKey === `${entry.id}:${variantIndex}`;
+  const active = speech.speakingId === entry.id;
   return (
     <button
       className={`speak-btn ${label ? "speak-btn--label" : ""} ${inverted ? "speak-btn--inverted" : ""} ${active ? "is-speaking" : ""}`}
       onClick={(event) => {
         event.stopPropagation();
-        speech.speak(entry, variantIndex);
+        speech.speak(entry);
       }}
-      aria-label={`ฟังเสียงอ่าน ${variant?.text ?? entry.term}`}
+      aria-label={`ฟังคำเต็มของ ${entry.term}`}
     >
       <IconSpeaker active={active} size={20} />
       {label ? <span>{label}</span> : null}
@@ -129,11 +141,12 @@ export function TermRow({
         </span>
         {pointsAtVariant && variant.pron ? (
           <span className="row-pron">
-            {variant.text} อ่านว่า {variant.pron}
+            {variant.text} ({variant.pron})
           </span>
         ) : entry.pronunciation ? (
-          <span className="row-pron">อ่านว่า {entry.pronunciation}</span>
+          <span className="row-pron">({entry.pronunciation})</span>
         ) : null}
+        {entry.fullName ? <span className="row-full">{shortFullName(entry.fullName)}</span> : null}
         {!compact ? <span className="row-summary">{entry.summary}</span> : null}
         <span className="row-meta">
           {showCategory ? <span>หมวด {getCategory(entry.categoryId)?.num} · {getCategory(entry.categoryId)?.title}</span> : null}
@@ -142,7 +155,7 @@ export function TermRow({
         </span>
       </button>
       <div className="row-actions">
-        <SpeakButton entry={entry} variantIndex={variantIndex} speech={speech} />
+        <SpeakButton entry={entry} speech={speech} />
         <span className="row-go" aria-hidden>
           <IconArrow size={18} />
         </span>
@@ -153,3 +166,17 @@ export function TermRow({
 
 /** Big display terms shrink for long names like "Watch Time / Stay Duration / ...". */
 export const termSize = (term: string) => (term.length <= 10 ? undefined : term.length <= 20 ? "m" : "s");
+
+/** "Live Health Score (คะแนนสุขภาพไลฟ์) — คะแนนรวมของ Creatr365" -> text before the dash. */
+export const shortFullName = (fullName: string) => fullName.split(" — ")[0];
+
+export function Credit() {
+  return (
+    <footer className="credit">
+      <p>© 2026 All rights reserved | Created by iDEAS365 x Generative AI</p>
+      <p>
+        Contact : <a href="mailto:hello@ideas365.space">hello@ideas365.space</a>
+      </p>
+    </footer>
+  );
+}

@@ -80,12 +80,6 @@ export default function App() {
       <div className="desk">
         <Art slot="desk-left" className="desk-art desk-art--left" fallback={<SceneDeskLeft />} />
         <Art slot="desk-right" className="desk-art desk-art--right" fallback={<SceneDeskRight />} />
-        <p className="desk-note" aria-hidden>
-          ลองพิมพ์ผิด เช่น “gvm” หรือพิมพ์คำอ่าน “ซีวีอาร์” ดูสิ
-          <svg viewBox="0 0 120 60" className="desk-arrow">
-            <path d="M4 10 C 40 4, 80 14, 104 44 M104 44 L 92 42 M104 44 L 104 32" />
-          </svg>
-        </p>
         <div className="device">
           <div className="device-screen">
             <div className="screen" key={key}>
@@ -93,11 +87,6 @@ export default function App() {
             </div>
             {menuOpen ? <Menu onClose={() => setMenuOpen(false)} /> : null}
             {showIntro ? <Onboarding onDone={finishIntro} /> : null}
-            {speech.notice ? (
-              <div className="toast" role="status">
-                {speech.notice}
-              </div>
-            ) : null}
           </div>
         </div>
       </div>

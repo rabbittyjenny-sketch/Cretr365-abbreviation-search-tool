@@ -4,7 +4,6 @@ import { IconBook, IconClose, IconGrid, IconInfo, IconSparkle, IconStar, SceneLi
 import { Wordmark } from "../components/ui";
 import type { ImageSlot } from "../config/images";
 import { useApp } from "../context";
-import type { VoiceMode } from "../lib/speech";
 
 const SLIDES: { word: string; kicker?: string; slot: ImageSlot; body: ReactNode; Fallback: typeof SceneSearch }[] = [
   {
@@ -20,7 +19,7 @@ const SLIDES: { word: string; kicker?: string; slot: ImageSlot; body: ReactNode;
     ),
     Fallback: SceneSearch,
   },
-  { word: "Listen", slot: "onboarding-2", body: "กดลำโพงเพื่อฟังวิธีอ่านเฉพาะคำนั้น ไม่อ่านยาวทั้งย่อหน้า พูดตามได้ทันที", Fallback: SceneListen },
+  { word: "Listen", slot: "onboarding-2", body: "กดลำโพงเพื่อฟังคำเต็มของตัวย่อนั้น ไม่อ่านยาวทั้งย่อหน้า พูดตามได้ทันที", Fallback: SceneListen },
   { word: "Save", slot: "onboarding-3", body: "เก็บคำที่ใช้บ่อยไว้ในสมุดคำ แล้วไล่ดูคำในหมวดเดียวกันต่อได้เลย", Fallback: SceneSave },
 ];
 
@@ -74,16 +73,11 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
 }
 
 export function Menu({ onClose }: { onClose: () => void }) {
-  const { go, speech, openIntro, savedIds } = useApp();
+  const { go, openIntro, savedIds } = useApp();
   const pick = (action: () => void) => {
     onClose();
     action();
   };
-  const voiceOptions: { value: VoiceMode; label: string }[] = [
-    { value: "auto", label: "อัตโนมัติ" },
-    { value: "th", label: "ไทย" },
-    { value: "en", label: "EN" },
-  ];
   return (
     <div className="sheet-layer" onClick={onClose}>
       <div className="sheet" role="dialog" aria-label="เมนู" onClick={(event) => event.stopPropagation()}>
@@ -110,18 +104,6 @@ export function Menu({ onClose }: { onClose: () => void }) {
             <IconBook /> ดูหน้าแนะนำอีกครั้ง
           </button>
         </nav>
-        {speech.supported ? (
-          <div className="sheet-voice">
-            <span className="hand-note">เสียงอ่าน</span>
-            <div className="segmented segmented--small" role="radiogroup" aria-label="เสียงอ่าน">
-              {voiceOptions.map((option) => (
-                <button key={option.value} role="radio" aria-checked={speech.mode === option.value} className={speech.mode === option.value ? "is-on" : undefined} onClick={() => speech.setMode(option.value)}>
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        ) : null}
       </div>
     </div>
   );

@@ -1,47 +1,41 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { Entry } from "../data/types";
-import { useStored } from "./store";
-
-export type VoiceMode = "auto" | "th" | "en";
 
 const supported = typeof window !== "undefined" && "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
 
-const findVoice = (voices: SpeechSynthesisVoice[], lang: "th" | "en") =>
-  voices.find((voice) => voice.lang.toLowerCase().replace("_", "-").startsWith(lang === "th" ? "th" : "en-us")) ??
-  voices.find((voice) => voice.lang.toLowerCase().startsWith(lang));
+const englishVoice = (voices: SpeechSynthesisVoice[]) =>
+  voices.find((voice) => voice.lang.toLowerCase().replace("_", "-").startsWith("en-us")) ??
+  voices.find((voice) => voice.lang.toLowerCase().startsWith("en"));
 
-/** Thai reading guide -> something a TTS voice reads cleanly ("ซี-ที-อาร์" -> "ซี ที อาร์"). */
-function cleanThai(value: string) {
-  return value.replace(/\([^)]*\)/g, " ").replace(/[-–]/g, " ").replace(/\s+/g, " ").trim();
-}
-
+/** Makes a full name read naturally: drops Thai glosses and turns symbols into words. */
 function cleanEnglish(value: string) {
   return value
+    .split(" — ")[0]
     .replace(/\([^)]*\)/g, " ")
+    .replace(/[฀-๿]+/g, (thai) => (thai === "ถึง" ? " to " : " "))
     .replace(/&/g, " and ")
+    .replace(/\+/g, " plus ")
+    .replace(/\s*(→|\/)\s*/g, ", ")
     .replace(/(\w)–(\w)/g, "$1 to $2")
-    .replace(/[-/]/g, " ")
     .replace(/\s+/g, " ")
+    .replace(/^[\s,]+|[\s,]+$/g, "")
     .trim();
 }
 
 /**
- * Picks exactly what to say for one term — never the explanation.
- * `variantIndex` is the variant the user searched for (e.g. "CVR" in "CR / CVR").
+ * What the speaker says for one term: its full name (คำเต็ม), never the
+ * abbreviation and never the explanation. Falls back to the term itself
+ * when the source gives no English full name (e.g. "Content", "TikTok Shop").
  */
-export function utteranceFor(entry: Entry, variantIndex: number, useThai: boolean) {
-  const variant = entry.variants[variantIndex] ?? entry.variants[0];
-  const thai = variant?.pron ?? (variantIndex === 0 ? entry.variants[0]?.pron : undefined);
-  if (useThai && thai) return { text: cleanThai(thai), lang: "th" as const };
-  return { text: cleanEnglish(variant?.text ?? entry.term), lang: "en" as const };
+export function utteranceFor(entry: Entry) {
+  const full = cleanEnglish(entry.fullName);
+  if (/[A-Za-z]/.test(full)) return full;
+  return cleanEnglish(entry.term);
 }
 
 export function useSpeech() {
-  const [mode, setMode] = useStored<VoiceMode>("voice", "auto");
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
-  const [speakingKey, setSpeakingKey] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
-  const timer = useRef<number>();
+  const [speakingId, setSpeakingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!supported) return;
@@ -51,40 +45,26 @@ export function useSpeech() {
     return () => window.speechSynthesis.removeEventListener("voiceschanged", load);
   }, []);
 
-  const thaiVoice = findVoice(voices, "th");
-  const englishVoice = findVoice(voices, "en");
-
-  const flash = (message: string) => {
-    setNotice(message);
-    window.clearTimeout(timer.current);
-    timer.current = window.setTimeout(() => setNotice(null), 3200);
-  };
-
   const speak = useCallback(
-    (entry: Entry, variantIndex = 0) => {
+    (entry: Entry) => {
       if (!supported) return;
-      const wantThai = mode !== "en";
-      // Some browsers expose voices late; only fall back when we know there is no Thai voice.
-      const thaiAvailable = Boolean(thaiVoice) || voices.length === 0;
-      const { text, lang } = utteranceFor(entry, variantIndex, wantThai && thaiAvailable);
-      if (mode === "th" && !thaiAvailable) flash("เครื่องนี้ยังไม่มีเสียงภาษาไทย จึงอ่านเป็นภาษาอังกฤษแทน");
-      const key = `${entry.id}:${variantIndex}`;
       const synth = window.speechSynthesis;
       synth.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = lang === "th" ? "th-TH" : "en-US";
-      const voice = lang === "th" ? thaiVoice : englishVoice;
+      const utterance = new SpeechSynthesisUtterance(utteranceFor(entry));
+      utterance.lang = "en-US";
+      const voice = englishVoice(voices);
       if (voice) utterance.voice = voice;
-      utterance.rate = lang === "th" ? 0.95 : 0.9;
-      utterance.onend = () => setSpeakingKey((current) => (current === key ? null : current));
-      utterance.onerror = () => setSpeakingKey((current) => (current === key ? null : current));
-      setSpeakingKey(key);
+      utterance.rate = 0.92;
+      const done = () => setSpeakingId((current) => (current === entry.id ? null : current));
+      utterance.onend = done;
+      utterance.onerror = done;
+      setSpeakingId(entry.id);
       synth.speak(utterance);
     },
-    [mode, thaiVoice, englishVoice, voices.length],
+    [voices],
   );
 
-  return { supported, speak, speakingKey, mode, setMode, hasThaiVoice: Boolean(thaiVoice), notice };
+  return { supported, speak, speakingId };
 }
 
 export type Speech = ReturnType<typeof useSpeech>;

@@ -357,11 +357,13 @@ function mergeDuplicates(entries: (Entry & { repeated?: boolean })[]): Entry[] {
       result.push(entry);
       continue;
     }
-    const fields: Field[] = [];
-    if (entry.fullName && entry.fullName !== target.fullName) fields.push({ label: "ชื่อเต็ม / คำแปล", value: entry.fullName });
-    if (entry.pronunciation && entry.pronunciation !== target.pronunciation) fields.push({ label: "คำอ่าน", value: entry.pronunciation });
-    fields.push(...entry.fields);
-    target.extraBlocks.push({ source: entry.section, fields });
+    // A "(ย้ำ)" row or a course-shorthand repeat only points back at the main row,
+    // so only a genuinely different explanation from another category is kept.
+    const meaning = entry.fields.find((field) => field.label === "ความหมาย");
+    if (!entry.repeated && entry.categoryId !== "11" && meaning) {
+      const categoryTitle = entry.section.split(" · ")[1] ?? "";
+      target.extraBlocks.push({ source: `ในบริบท${categoryTitle}`, fields: [meaning] });
+    }
     entry.variants.forEach((variant) => {
       if (!target.variants.some((item) => compactKey(item.text) === compactKey(variant.text))) target.variants.push(variant);
     });
@@ -387,10 +389,6 @@ function applyGlossary18(entries: Entry[], rows: { cells: string[] }[]) {
     const target = findEntry(entries, parts.term, categoryNum);
     if (!target) throw new Error(`Glossary 18: no entry for ${parts.term}`);
     target.mustKnow = true;
-    target.extraBlocks.push({
-      source: "หมวด 11 · 11.2 Glossary 18 คำ (คำที่ต้องรู้)",
-      fields: [{ label: "ความหมาย (ตามต้นฉบับ)", value: cells[1] ?? "" }],
-    });
     const key = compactKey(parts.term);
     const variant = target.variants.find((item) => compactKey(item.text) === key);
     if (variant) {

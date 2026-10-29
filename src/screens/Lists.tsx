@@ -41,7 +41,7 @@ export function CategoryScreen({ id }: { id: string }) {
       </section>
       {category.intro ? <p className="list-intro">{category.intro.replace(/\\/g, "")}</p> : null}
       <div className="pad-x">
-        <SectionTitle count={items.length}>คำในหมวดนี้</SectionTitle>
+        <SectionTitle>คำในหมวดนี้</SectionTitle>
         <EntryList items={items} />
       </div>
     </div>
@@ -93,7 +93,7 @@ export function AZScreen() {
 
   return (
     <div className="screen-scroll" ref={scroller} data-screen="az">
-      <TopBar onBack={back} title={<span className="topbar-label">ดัชนี A–Z · {entries.length} คำ</span>} />
+      <TopBar onBack={back} title={<span className="topbar-label">ดัชนี A–Z</span>} />
       <nav className="az-keys" aria-label="ตัวอักษร">
         {[...LETTERS, ...(groups.has("#") ? ["#"] : [])].map((letter) => (
           <button key={letter} className="az-key" disabled={!groups.has(letter)} onClick={() => jump(letter)}>
