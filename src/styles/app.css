@@ -210,31 +210,46 @@ a {
   }
 }
 
-.is-embed body,
+/*
+ * Inside an iframe (or ?embed=1) the phone bezel goes away. A narrow iframe is
+ * filled edge to edge; a wide one keeps the dotted desk and its doodles around
+ * a centred, full-height column, so the host page never shows empty bands.
+ */
 .is-embed .desk {
-  background: var(--paper);
-}
-.is-embed .desk {
-  display: block;
   padding: 0;
+  min-height: 100dvh;
+  place-items: stretch center;
 }
 .is-embed .device {
-  width: 100%;
+  width: min(100%, 460px);
   height: 100dvh;
   min-height: 0;
   padding: 0;
   border: 0;
+  border-left: 2px solid var(--ink);
+  border-right: 2px solid var(--ink);
   border-radius: 0;
-  box-shadow: none;
+  box-shadow: 10px 0 0 rgba(29, 29, 27, 0.08);
   background: var(--paper);
 }
-.is-embed .device::before,
-.is-embed .desk-art,
-.is-embed .desk-note {
+.is-embed .device::before {
   display: none;
 }
 .is-embed .device-screen {
   border-radius: 0;
+}
+@media (max-width: 599px) {
+  .is-embed .device {
+    width: 100%;
+    border-left: 0;
+    border-right: 0;
+    box-shadow: none;
+  }
+}
+@media (min-width: 1000px) {
+  .is-embed .desk-art {
+    bottom: 6%;
+  }
 }
 
 /* ---------- screens ---------- */
